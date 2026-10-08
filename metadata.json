@@ -1,0 +1,6 @@
+{
+  "name": "TSR Transport - Billetterie & Gestion",
+  "description": "Application numérique de vente, réservation, contrôle par QR Code et gestion des billets de transport interurbain TSR Transport au Burkina Faso.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
