@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net (Default-Deny Catch-All)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers globaux
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'yameogojp1@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 2. Gares TSR Transport (Lecture publique, écriture admin)
+    match /stations/{stationId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(stationId);
+    }
+
+    // 3. Trajets et départs de car (Lecture publique, écriture admin)
+    match /trips/{tripId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin() && isValidId(tripId);
+    }
+
+    // 4. Espace privé voyageur : Réservations
+    match /users/{userId}/bookings/{bookingId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(bookingId) &&
+        incoming().userId == userId &&
+        incoming().totalAmount is number &&
+        incoming().totalAmount >= 0;
+      allow update: if isOwner(userId) && isValidId(bookingId) &&
+        incoming().userId == existing().userId;
+      allow delete: if isAdmin();
+    }
+
+    // 5. Espace privé voyageur : Billets
+    match /users/{userId}/tickets/{ticketId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(ticketId) &&
+        incoming().userId == userId;
+      allow update: if (isOwner(userId) || isAdmin()) && isValidId(ticketId) &&
+        incoming().userId == existing().userId;
+      allow delete: if isAdmin();
+    }
+
+    // 6. Alertes Anti-Fraude
+    match /fraudAlerts/{alertId} {
+      allow get, list: if isAdmin();
+      allow create: if isSignedIn() && isValidId(alertId);
+      allow update, delete: if isAdmin();
+    }
+  }
+}

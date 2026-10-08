@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { Smartphone, ShieldCheck, LayoutDashboard, CheckSquare, Sparkles } from 'lucide-react';
 import { I18nProvider } from './design-system/i18n';
+import { FirebaseProvider } from './firebase/FirebaseContext';
 import { ClientApp } from './presentation/client/ClientApp';
 import { AgentApp } from './presentation/agent/AgentApp';
 import { DashboardApp } from './presentation/dashboard/DashboardApp';
@@ -18,18 +19,19 @@ export default function App() {
 
   return (
     <I18nProvider>
-      <div className="min-h-screen flex flex-col bg-slate-900 font-sans">
-        {/* Bandeau Supérieur de Navigation Multi-Applications TSR */}
-        <div className="bg-slate-950 text-white px-4 py-2 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 z-50">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-black tracking-wide text-[#fcd116]">
-              TSR APP v1.0
-            </span>
-            <span className="text-[10px] text-slate-400 hidden sm:inline">
-              Burkina Faso • Préproduction
-            </span>
-          </div>
+      <FirebaseProvider>
+        <div className="min-h-screen flex flex-col bg-slate-900 font-sans">
+          {/* Bandeau Supérieur de Navigation Multi-Applications TSR */}
+          <div className="bg-slate-950 text-white px-4 py-2 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 z-50">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-black tracking-wide text-[#fcd116]">
+                TSR APP v1.0
+              </span>
+              <span className="text-[10px] text-slate-400 hidden sm:inline">
+                Burkina Faso • Firebase Cloud Connecté 🔥
+              </span>
+            </div>
 
           {/* Commutateur des 3 Applications du cahier des charges */}
           <div className="flex items-center bg-slate-900 p-1 rounded-xl border border-slate-800 gap-1">
@@ -97,6 +99,7 @@ export default function App() {
           <TestSuiteModal onClose={() => setIsQaModalOpen(false)} />
         </Modal>
       </div>
+      </FirebaseProvider>
     </I18nProvider>
   );
 }

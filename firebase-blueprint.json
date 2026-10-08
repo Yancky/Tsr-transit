@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "station": {
+      "title": "Station",
+      "description": "Gare TSR Transport au Burkina Faso",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 150 },
+        "code": { "type": "string", "maxLength": 20 },
+        "city": { "type": "string", "maxLength": 100 },
+        "address": { "type": "string", "maxLength": 255 },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "phone": { "type": "string", "maxLength": 30 },
+        "isActive": { "type": "boolean" }
+      },
+      "required": ["id", "name", "code", "city", "address", "latitude", "longitude", "isActive"]
+    },
+    "trip": {
+      "title": "Trip",
+      "description": "Voyage interurbain programmé",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "tripCode": { "type": "string", "maxLength": 50 },
+        "originStationId": { "type": "string", "maxLength": 128 },
+        "destinationStationId": { "type": "string", "maxLength": 128 },
+        "departureTime": { "type": "string", "maxLength": 50 },
+        "estimatedArrivalTime": { "type": "string", "maxLength": 50 },
+        "priceStandard": { "type": "number" },
+        "priceVip": { "type": "number" },
+        "category": { "type": "string", "enum": ["STANDARD", "VIP", "CLIMATISE"] },
+        "totalSeats": { "type": "number" },
+        "status": { "type": "string", "enum": ["SCHEDULED", "BOARDING", "DEPARTED", "ARRIVED", "CANCELLED"] },
+        "boardingGate": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "tripCode", "originStationId", "destinationStationId", "departureTime", "priceStandard", "priceVip", "category", "totalSeats", "status"]
+    },
+    "booking": {
+      "title": "Booking",
+      "description": "Réservation de transport effectuée par un client",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "bookingReference": { "type": "string", "maxLength": 50 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "purchaserName": { "type": "string", "maxLength": 150 },
+        "purchaserPhone": { "type": "string", "maxLength": 30 },
+        "tripId": { "type": "string", "maxLength": 128 },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING_PAYMENT", "CONFIRMED", "CANCELLED"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "bookingReference", "userId", "purchaserName", "purchaserPhone", "tripId", "totalAmount", "status"]
+    },
+    "ticket": {
+      "title": "Ticket",
+      "description": "Billet électronique émis avec QR Code",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "ticketNumber": { "type": "string", "maxLength": 50 },
+        "bookingId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "tripId": { "type": "string", "maxLength": 128 },
+        "passengerName": { "type": "string", "maxLength": 150 },
+        "seatNumber": { "type": "number" },
+        "amountPaid": { "type": "number" },
+        "status": { "type": "string", "enum": ["VALID", "BOARDED", "CANCELLED"] },
+        "issuedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "ticketNumber", "bookingId", "userId", "tripId", "passengerName", "seatNumber", "amountPaid", "status"]
+    },
+    "fraudAlert": {
+      "title": "FraudAlert",
+      "description": "Alerte de sécurité ou tentative de double scan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "alertType": { "type": "string", "maxLength": 100 },
+        "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"] },
+        "details": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["OPEN", "INVESTIGATING", "RESOLVED"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "alertType", "severity", "status"]
+    }
+  },
+  "firestore": {
+    "/stations/{stationId}": {
+      "schema": { "$ref": "#/entities/station" },
+      "description": "Catalogue public des gares TSR Transport"
+    },
+    "/trips/{tripId}": {
+      "schema": { "$ref": "#/entities/trip" },
+      "description": "Départs programmés des cars interurbains"
+    },
+    "/users/{userId}/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/booking" },
+      "description": "Réservations privées appartenant à l'utilisateur"
+    },
+    "/users/{userId}/tickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/ticket" },
+      "description": "Billets électroniques de l'utilisateur"
+    },
+    "/fraudAlerts/{alertId}": {
+      "schema": { "$ref": "#/entities/fraudAlert" },
+      "description": "Journal des alertes de sécurité et détections de double scan"
+    }
+  }
+}
